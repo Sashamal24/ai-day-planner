@@ -8,7 +8,7 @@ export async function GET() {
 
   const sql = getDb()
   const tasks = await sql`
-    SELECT id, title, status, created_at, priority, estimate_min, deadline
+    SELECT id, title, status, created_at, priority, estimate_min, deadline, scheduled_date
     FROM tasks
     WHERE user_id = ${session.user.id}
     ORDER BY created_at ASC

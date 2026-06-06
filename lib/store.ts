@@ -43,6 +43,17 @@ export function useTasks() {
     }
   }, [])
 
+  const scheduleTask = useCallback(async (id: string, scheduled_date: string | null) => {
+    const res = await fetch(`/api/tasks/${id}`, {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ scheduled_date }),
+    })
+    if (res.ok) {
+      setTasks((prev) => prev.map((t) => (t.id === id ? { ...t, scheduled_date } : t)))
+    }
+  }, [])
+
   const moveToToday = useCallback((id: string) => updateStatus(id, 'today'), [updateStatus])
 
   const toggleDone = useCallback(
@@ -59,5 +70,5 @@ export function useTasks() {
     setTasks((prev) => prev.filter((t) => t.id !== id))
   }, [])
 
-  return { tasks, loading, addTasks, moveToToday, toggleDone, deleteTask }
+  return { tasks, loading, addTasks, moveToToday, toggleDone, deleteTask, scheduleTask }
 }

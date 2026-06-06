@@ -9,6 +9,7 @@ export interface Task {
   priority?: TaskPriority | null
   estimate_min?: number | null
   deadline?: string | null
+  scheduled_date?: string | null
 }
 
 export interface ParsedTask {
