@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useEffect, useCallback } from 'react'
-import { Task, TaskStatus } from './types'
+import { Task, TaskStatus, ParsedTask } from './types'
 
 export function useTasks() {
   const [tasks, setTasks] = useState<Task[]>([])
@@ -17,11 +17,14 @@ export function useTasks() {
     fetchTasks()
   }, [fetchTasks])
 
-  const addTasks = useCallback(async (titles: string[]) => {
+  const addTasks = useCallback(async (tasks: ParsedTask[] | string[]) => {
+    const body = typeof tasks[0] === 'string'
+      ? { titles: tasks as string[] }
+      : { tasks: tasks as ParsedTask[] }
     const res = await fetch('/api/tasks', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ titles }),
+      body: JSON.stringify(body),
     })
     if (res.ok) {
       const created: Task[] = await res.json()

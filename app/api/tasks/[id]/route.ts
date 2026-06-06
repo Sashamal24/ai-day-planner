@@ -22,7 +22,7 @@ export async function PATCH(
     UPDATE tasks
     SET status = ${status}
     WHERE id = ${id} AND user_id = ${session.user.id}
-    RETURNING id, title, status, created_at
+    RETURNING id, title, status, created_at, priority, estimate_min, deadline
   ` as Row[]
 
   if (rows.length === 0) return NextResponse.json({ error: 'Not found' }, { status: 404 })

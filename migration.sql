@@ -18,3 +18,9 @@ CREATE TABLE IF NOT EXISTS tasks (
 );
 
 CREATE INDEX IF NOT EXISTS tasks_user_id_idx ON tasks(user_id);
+
+-- AI fields (run once if table already exists)
+ALTER TABLE tasks
+  ADD COLUMN IF NOT EXISTS priority     TEXT CHECK (priority IN ('high', 'medium', 'low')),
+  ADD COLUMN IF NOT EXISTS estimate_min INTEGER,
+  ADD COLUMN IF NOT EXISTS deadline     DATE;
