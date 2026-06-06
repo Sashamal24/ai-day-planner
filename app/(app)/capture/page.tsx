@@ -128,9 +128,12 @@ export default function CapturePage() {
 
   if (parsed) {
     return (
-      <div className="flex flex-col min-h-[calc(100vh-56px)] px-4 pt-8 pb-6">
-        <h1 className="text-2xl font-bold text-gray-900 mb-1">Перевір задачі</h1>
-        <p className="text-sm text-gray-400 mb-6">AI розібрав твій текст — перевір і збережи</p>
+      <div className="flex flex-col min-h-screen bg-gray-50">
+        <div className="bg-gradient-to-br from-blue-600 via-indigo-600 to-violet-600 px-5 pt-12 pb-6">
+          <h1 className="text-white text-2xl font-bold mb-1">Перевір задачі</h1>
+          <p className="text-white/70 text-sm">AI розібрав твій текст — перевір і збережи</p>
+        </div>
+        <div className="flex flex-col flex-1 px-4 pt-5 pb-6">
 
         <ul className="flex flex-col gap-3 mb-6">
           {parsed.map((task, i) => (
@@ -179,14 +182,18 @@ export default function CapturePage() {
             Назад до тексту
           </button>
         </div>
+        </div>
       </div>
     )
   }
 
   return (
-    <div className="flex flex-col min-h-[calc(100vh-56px)] px-4 pt-8 pb-6">
-      <h1 className="text-2xl font-bold text-gray-900 mb-2">Capture</h1>
-      <p className="text-sm text-gray-400 mb-4">Запиши все, що в голові — по одному або списком</p>
+    <div className="flex flex-col min-h-screen bg-gray-50">
+      <div className="bg-gradient-to-br from-blue-600 via-indigo-600 to-violet-600 px-5 pt-12 pb-6">
+        <h1 className="text-white text-2xl font-bold mb-1">Capture</h1>
+        <p className="text-white/70 text-sm">Запиши все, що в голові</p>
+      </div>
+      <div className="flex flex-col flex-1 px-4 pt-5 pb-6">
 
       <textarea
         className="flex-1 w-full rounded-2xl border border-gray-200 bg-white p-4 text-gray-900 text-base placeholder-gray-300 resize-none focus:outline-none focus:ring-2 focus:ring-indigo-400 shadow-sm min-h-[200px]"
@@ -248,6 +255,7 @@ export default function CapturePage() {
             'Обробити з AI'
           )}
         </button>
+      </div>
       </div>
     </div>
   )

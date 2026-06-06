@@ -8,31 +8,40 @@ export default function InboxPage() {
   const inbox = tasks.filter((t) => t.status === 'inbox')
 
   return (
-    <div className="flex flex-col min-h-[calc(100vh-56px)] px-4 pt-8 pb-6">
-      <h1 className="text-2xl font-bold text-gray-900 mb-1">Inbox</h1>
-      <p className="text-sm text-gray-400 mb-6">Розбери та відправ у Today</p>
+    <div className="flex flex-col min-h-screen bg-gray-50">
+      <div className="bg-gradient-to-br from-blue-600 via-indigo-600 to-violet-600 px-5 pt-12 pb-6">
+        <h1 className="text-white text-2xl font-bold mb-1">Inbox</h1>
+        <p className="text-white/70 text-sm">
+          {inbox.length > 0 ? `${inbox.length} задач чекають на розбір` : 'Порожньо — добре!'}
+        </p>
+      </div>
 
-      {inbox.length === 0 ? (
-        <div className="flex-1 flex flex-col items-center justify-center text-center gap-3 text-gray-400">
-          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="w-12 h-12 text-gray-200">
-            <path fillRule="evenodd" d="M2.625 6.75a1.125 1.125 0 1 1 2.25 0 1.125 1.125 0 0 1-2.25 0Zm4.875 0A.75.75 0 0 1 8.25 6h12a.75.75 0 0 1 0 1.5h-12a.75.75 0 0 1-.75-.75ZM2.625 12a1.125 1.125 0 1 1 2.25 0 1.125 1.125 0 0 1-2.25 0ZM7.5 12a.75.75 0 0 1 .75-.75h12a.75.75 0 0 1 0 1.5h-12A.75.75 0 0 1 7.5 12Zm-4.875 5.25a1.125 1.125 0 1 1 2.25 0 1.125 1.125 0 0 1-2.25 0Zm4.875 0a.75.75 0 0 1 .75-.75h12a.75.75 0 0 1 0 1.5h-12a.75.75 0 0 1-.75-.75Z" clipRule="evenodd" />
-          </svg>
-          <p className="text-base font-medium">Inbox порожній — поверніся і диктуй!</p>
-        </div>
-      ) : (
-        <ul className="flex flex-col gap-3">
-          {inbox.map((task) => (
-            <li key={task.id}>
-              <TaskCard
-                task={task}
-                checkLabel="Перемістити у Today"
-                onCheck={() => moveToToday(task.id)}
-                onDelete={() => deleteTask(task.id)}
-              />
-            </li>
-          ))}
-        </ul>
-      )}
+      <div className="flex-1 px-4 pt-5 pb-6">
+        {inbox.length === 0 ? (
+          <div className="flex flex-col items-center justify-center text-center gap-3 pt-16">
+            <div className="w-16 h-16 rounded-full bg-indigo-50 flex items-center justify-center">
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="w-8 h-8 text-indigo-300">
+                <path fillRule="evenodd" d="M6.912 3a3 3 0 0 0-2.868 2.118l-2.411 7.838a3 3 0 0 0-.133.882V18a3 3 0 0 0 3 3h15a3 3 0 0 0 3-3v-4.162c0-.299-.045-.596-.133-.882l-2.412-7.838A3 3 0 0 0 17.088 3H6.912Zm13.823 9.75-2.213-7.191A1.5 1.5 0 0 0 17.088 4.5H6.912a1.5 1.5 0 0 0-1.434 1.059L3.265 12.75H6.11a3 3 0 0 1 2.684 1.658l.256.513a1.5 1.5 0 0 0 1.342.829h3.218a1.5 1.5 0 0 0 1.342-.83l.256-.512a3 3 0 0 1 2.684-1.658h2.844Z" clipRule="evenodd" />
+              </svg>
+            </div>
+            <p className="text-base font-medium text-gray-500">Inbox порожній</p>
+            <p className="text-sm text-gray-400">Поверніся і диктуй нові задачі!</p>
+          </div>
+        ) : (
+          <ul className="flex flex-col gap-3">
+            {inbox.map((task) => (
+              <li key={task.id}>
+                <TaskCard
+                  task={task}
+                  checkLabel="Перемістити у Today"
+                  onCheck={() => moveToToday(task.id)}
+                  onDelete={() => deleteTask(task.id)}
+                />
+              </li>
+            ))}
+          </ul>
+        )}
+      </div>
     </div>
   )
 }

@@ -1,14 +1,14 @@
 import { auth } from '@/auth'
 import BottomNav from '@/components/BottomNav'
-import AppHeader from '@/components/AppHeader'
 
 export default async function AppLayout({ children }: { children: React.ReactNode }) {
   const session = await auth()
+  const email = session?.user?.email ?? ''
+  const name = session?.user?.name ?? email.split('@')[0] ?? 'User'
 
   return (
     <>
-      <AppHeader email={session?.user?.email ?? ''} />
-      <div className="max-w-md mx-auto min-h-screen pt-14 pb-16">
+      <div className="max-w-md mx-auto min-h-screen pb-20" data-email={email} data-name={name}>
         {children}
       </div>
       <BottomNav />
