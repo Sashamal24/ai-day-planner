@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useRef, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import { useTasks } from '@/lib/store'
 
@@ -11,10 +11,42 @@ function parseInput(text: string): string[] {
     .filter((s) => s.length > 0)
 }
 
+// Web Speech API types
+interface SpeechRecognitionEvent extends Event {
+  results: SpeechRecognitionResultList
+}
+interface SpeechRecognitionErrorEvent extends Event {
+  error: string
+}
+interface SpeechRecognitionInstance extends EventTarget {
+  lang: string
+  continuous: boolean
+  interimResults: boolean
+  start(): void
+  stop(): void
+  onresult: ((e: SpeechRecognitionEvent) => void) | null
+  onerror: ((e: SpeechRecognitionErrorEvent) => void) | null
+  onend: (() => void) | null
+}
+
+function getSpeechRecognition(): (new () => SpeechRecognitionInstance) | null {
+  if (typeof window === 'undefined') return null
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const w = window as any
+  return w.SpeechRecognition ?? w.webkitSpeechRecognition ?? null
+}
+
 export default function CapturePage() {
   const [input, setInput] = useState('')
+  const [listening, setListening] = useState(false)
+  const [supported, setSupported] = useState(true)
+  const recognitionRef = useRef<SpeechRecognitionInstance | null>(null)
   const { addTasks } = useTasks()
   const router = useRouter()
+
+  useEffect(() => {
+    if (!getSpeechRecognition()) setSupported(false)
+  }, [])
 
   const handleSubmit = () => {
     const titles = parseInput(input)
@@ -22,6 +54,38 @@ export default function CapturePage() {
     addTasks(titles)
     setInput('')
     router.push('/inbox')
+  }
+
+  const toggleMic = () => {
+    if (listening) {
+      recognitionRef.current?.stop()
+      return
+    }
+
+    const SR = getSpeechRecognition()
+    if (!SR) return
+
+    const recognition = new SR()
+    recognition.lang = 'uk-UA'
+    recognition.continuous = true
+    recognition.interimResults = false
+
+    recognition.onresult = (e: SpeechRecognitionEvent) => {
+      const transcript = Array.from(e.results)
+        .map((r) => r[0].transcript)
+        .join(' ')
+      setInput((prev) => (prev ? prev + ' ' + transcript : transcript))
+    }
+
+    recognition.onerror = (e: SpeechRecognitionErrorEvent) => {
+      if (e.error !== 'aborted') setListening(false)
+    }
+
+    recognition.onend = () => setListening(false)
+
+    recognitionRef.current = recognition
+    recognition.start()
+    setListening(true)
   }
 
   return (
@@ -39,16 +103,36 @@ export default function CapturePage() {
 
       <div className="flex flex-col items-center gap-4 mt-6">
         {/* Mic button */}
-        <button
-          type="button"
-          aria-label="Диктувати голосом"
-          className="w-[72px] h-[72px] rounded-full bg-indigo-500 text-white flex items-center justify-center shadow-lg hover:bg-indigo-600 active:scale-95 transition-transform"
-        >
-          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="w-8 h-8">
-            <path d="M8.25 4.5a3.75 3.75 0 1 1 7.5 0v8.25a3.75 3.75 0 1 1-7.5 0V4.5Z" />
-            <path d="M6 10.5a.75.75 0 0 1 .75.75v1.5a5.25 5.25 0 1 0 10.5 0v-1.5a.75.75 0 0 1 1.5 0v1.5a6.751 6.751 0 0 1-6 6.709v2.291h3a.75.75 0 0 1 0 1.5h-7.5a.75.75 0 0 1 0-1.5h3v-2.291a6.751 6.751 0 0 1-6-6.709v-1.5A.75.75 0 0 1 6 10.5Z" />
-          </svg>
-        </button>
+        {supported && (
+          <div className="flex flex-col items-center gap-2">
+            <button
+              type="button"
+              onClick={toggleMic}
+              aria-label={listening ? 'Зупинити запис' : 'Диктувати голосом'}
+              className={`w-[72px] h-[72px] rounded-full text-white flex items-center justify-center shadow-lg transition-all active:scale-95 ${
+                listening
+                  ? 'bg-red-500 hover:bg-red-600 animate-pulse'
+                  : 'bg-indigo-500 hover:bg-indigo-600'
+              }`}
+            >
+              {listening ? (
+                // Stop icon
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="w-8 h-8">
+                  <path fillRule="evenodd" d="M4.5 7.5a3 3 0 0 1 3-3h9a3 3 0 0 1 3 3v9a3 3 0 0 1-3 3h-9a3 3 0 0 1-3-3v-9Z" clipRule="evenodd" />
+                </svg>
+              ) : (
+                // Mic icon
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="w-8 h-8">
+                  <path d="M8.25 4.5a3.75 3.75 0 1 1 7.5 0v8.25a3.75 3.75 0 1 1-7.5 0V4.5Z" />
+                  <path d="M6 10.5a.75.75 0 0 1 .75.75v1.5a5.25 5.25 0 1 0 10.5 0v-1.5a.75.75 0 0 1 1.5 0v1.5a6.751 6.751 0 0 1-6 6.709v2.291h3a.75.75 0 0 1 0 1.5h-7.5a.75.75 0 0 1 0-1.5h3v-2.291a6.751 6.751 0 0 1-6-6.709v-1.5A.75.75 0 0 1 6 10.5Z" />
+                </svg>
+              )}
+            </button>
+            <span className="text-xs text-gray-400">
+              {listening ? 'Говори… натисни щоб зупинити' : 'Диктувати голосом'}
+            </span>
+          </div>
+        )}
 
         {/* Submit button */}
         <button
