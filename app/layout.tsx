@@ -8,8 +8,8 @@ const geistSans = Geist({
 })
 
 export const metadata: Metadata = {
-  title: 'AI Day Planner',
-  description: 'Mobile-first daily planning app',
+  title: 'Planny',
+  description: 'AI-powered daily planner',
 }
 
 export default function RootLayout({

@@ -39,7 +39,7 @@ export default function PresentationPage() {
             <span className="text-white/90 text-xs font-semibold tracking-wide uppercase">AI-powered</span>
           </div>
           <h1 className="text-4xl font-extrabold text-white mb-4 leading-tight">
-            AI Day Planner
+            Planny
           </h1>
           <p className="text-white/80 text-lg mb-8 max-w-sm mx-auto leading-relaxed">
             Розмовляй з додатком як з асистентом — він сам розбере твої задачі, розставить пріоритети і скаже з чого почати
@@ -181,7 +181,7 @@ export default function PresentationPage() {
 
       {/* Footer */}
       <div className="border-t border-gray-100 py-6 text-center">
-        <p className="text-xs text-gray-300">Побудовано з Claude API · {new Date().getFullYear()}</p>
+        <p className="text-xs text-gray-300">Planny · Побудовано з Claude API · {new Date().getFullYear()}</p>
       </div>
 
     </div>
