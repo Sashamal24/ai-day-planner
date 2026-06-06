@@ -1,7 +1,6 @@
 import type { Metadata } from 'next'
 import { Geist } from 'next/font/google'
 import './globals.css'
-import BottomNav from '@/components/BottomNav'
 
 const geistSans = Geist({
   variable: '--font-geist-sans',
@@ -21,10 +20,7 @@ export default function RootLayout({
   return (
     <html lang="uk" className={`${geistSans.variable} h-full antialiased`}>
       <body className="min-h-full bg-gray-50">
-        <div className="max-w-md mx-auto min-h-screen pb-16">
-          {children}
-        </div>
-        <BottomNav />
+        {children}
       </body>
     </html>
   )

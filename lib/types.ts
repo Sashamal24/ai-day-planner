@@ -4,5 +4,5 @@ export interface Task {
   id: string
   title: string
   status: TaskStatus
-  createdAt: number
+  created_at: string
 }

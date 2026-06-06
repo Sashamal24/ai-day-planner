@@ -3,81 +3,58 @@
 import { useState, useEffect, useCallback } from 'react'
 import { Task, TaskStatus } from './types'
 
-const STORAGE_KEY = 'ai-planner-tasks'
-
-function loadTasks(): Task[] {
-  if (typeof window === 'undefined') return []
-  try {
-    const raw = localStorage.getItem(STORAGE_KEY)
-    return raw ? JSON.parse(raw) : []
-  } catch {
-    return []
-  }
-}
-
-function saveTasks(tasks: Task[]) {
-  if (typeof window === 'undefined') return
-  localStorage.setItem(STORAGE_KEY, JSON.stringify(tasks))
-}
-
 export function useTasks() {
   const [tasks, setTasks] = useState<Task[]>([])
+  const [loading, setLoading] = useState(true)
+
+  const fetchTasks = useCallback(async () => {
+    const res = await fetch('/api/tasks')
+    if (res.ok) setTasks(await res.json())
+    setLoading(false)
+  }, [])
 
   useEffect(() => {
-    setTasks(loadTasks())
+    fetchTasks()
+  }, [fetchTasks])
+
+  const addTasks = useCallback(async (titles: string[]) => {
+    const res = await fetch('/api/tasks', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ titles }),
+    })
+    if (res.ok) {
+      const created: Task[] = await res.json()
+      setTasks((prev) => [...prev, ...created])
+    }
   }, [])
 
-  const persist = useCallback((updated: Task[]) => {
-    setTasks(updated)
-    saveTasks(updated)
+  const updateStatus = useCallback(async (id: string, status: TaskStatus) => {
+    const res = await fetch(`/api/tasks/${id}`, {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ status }),
+    })
+    if (res.ok) {
+      setTasks((prev) => prev.map((t) => (t.id === id ? { ...t, status } : t)))
+    }
   }, [])
 
-  const addTasks = useCallback(
-    (titles: string[]) => {
-      const newTasks: Task[] = titles
-        .map((t) => t.trim())
-        .filter(Boolean)
-        .map((title) => ({
-          id: crypto.randomUUID(),
-          title,
-          status: 'inbox' as TaskStatus,
-          createdAt: Date.now(),
-        }))
-      persist([...loadTasks(), ...newTasks])
-    },
-    [persist]
-  )
-
-  const moveToToday = useCallback(
-    (id: string) => {
-      const current = loadTasks()
-      persist(
-        current.map((t) => (t.id === id ? { ...t, status: 'today' as TaskStatus } : t))
-      )
-    },
-    [persist]
-  )
+  const moveToToday = useCallback((id: string) => updateStatus(id, 'today'), [updateStatus])
 
   const toggleDone = useCallback(
     (id: string) => {
-      const current = loadTasks()
-      persist(
-        current.map((t) => {
-          if (t.id !== id) return t
-          return { ...t, status: t.status === 'done' ? 'today' : ('done' as TaskStatus) }
-        })
-      )
+      const task = tasks.find((t) => t.id === id)
+      if (!task) return Promise.resolve()
+      return updateStatus(id, task.status === 'done' ? 'today' : 'done')
     },
-    [persist]
+    [tasks, updateStatus]
   )
 
-  const deleteTask = useCallback(
-    (id: string) => {
-      const current = loadTasks()
-      persist(current.filter((t) => t.id !== id))
-    },
-    [persist]
-  )
+  const deleteTask = useCallback(async (id: string) => {
+    await fetch(`/api/tasks/${id}`, { method: 'DELETE' })
+    setTasks((prev) => prev.filter((t) => t.id !== id))
+  }, [])
 
-  return { tasks, addTasks, moveToToday, toggleDone, deleteTask }
+  return { tasks, loading, addTasks, moveToToday, toggleDone, deleteTask }
 }
