@@ -53,7 +53,7 @@ function SmartTip({ tasks }: { tasks: Task[] }) {
   if (!loading && !tip) return null
 
   return (
-    <div className="mx-4 -mt-4 mb-4 bg-white rounded-2xl shadow-sm border border-indigo-100 px-4 py-3 flex gap-3 items-start">
+    <div className="bg-white rounded-2xl shadow-sm border border-indigo-100 px-4 py-3 flex gap-3 items-start">
       <span className="text-lg mt-0.5">✨</span>
       <div className="flex-1">
         <p className="text-xs font-semibold text-indigo-500 mb-1">AI підказка</p>
@@ -84,7 +84,7 @@ export default function TodayPage() {
   return (
     <div className="flex flex-col min-h-screen">
       {/* Gradient hero */}
-      <div className="relative bg-gradient-to-br from-blue-600 via-indigo-600 to-violet-600 px-5 pt-12 pb-8">
+      <div className="relative bg-gradient-to-br from-blue-600 via-indigo-600 to-violet-600 px-5 pt-12 pb-5">
         <button
           onClick={() => signOut({ callbackUrl: '/auth/login' })}
           className="absolute top-12 right-5 text-xs text-white/60 hover:text-white/90 transition-colors font-medium"
@@ -93,7 +93,7 @@ export default function TodayPage() {
         </button>
 
         <p className="text-white/70 text-sm font-medium mb-1">{greeting} 👋</p>
-        <h1 className="text-white text-2xl font-bold leading-tight mb-6">
+        <h1 className="text-white text-xl font-bold leading-tight mb-4">
           Зробимо сьогодні<br />продуктивним
         </h1>
 
@@ -123,12 +123,10 @@ export default function TodayPage() {
         </div>
       </div>
 
-      {/* Smart tip */}
-      {!loading && pending.length > 0 && <SmartTip tasks={pending} />}
-
       {/* Task list */}
       <div className="flex-1 bg-gray-50 px-4 pt-4 pb-4">
-        <h2 className="text-base font-bold text-gray-900 mb-4">Задачі на сьогодні</h2>
+        {!loading && pending.length > 0 && <SmartTip tasks={pending} />}
+        <h2 className="text-base font-bold text-gray-900 mb-4 mt-4">Задачі на сьогодні</h2>
 
         {todayTasks.length === 0 ? (
           <div className="flex flex-col items-center justify-center text-center gap-3 pt-16 text-gray-400">
