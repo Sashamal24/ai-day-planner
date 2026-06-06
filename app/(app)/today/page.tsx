@@ -29,8 +29,8 @@ export default function TodayPage() {
   const { tasks, toggleDone } = useTasks()
   const todayTasks = tasks.filter((t) => t.status === 'today' || t.status === 'done')
   const pending = todayTasks.filter((t) => t.status === 'today')
-  const done = todayTasks.filter((t) => t.status === 'done')
-  const total = todayTasks.length
+  const done = tasks.filter((t) => t.status === 'done')
+  const total = tasks.length
   const percent = total > 0 ? Math.round((done.length / total) * 100) : 0
 
   const hour = new Date().getHours()
